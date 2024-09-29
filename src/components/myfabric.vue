@@ -2,58 +2,25 @@
     <div class="markbox">
       <!-- 操作区域 -->
       <div class="markbox-left">
-        <div class="markbox-left-small">
-          <a-button shape="circle" @click="cF.setZoom(true)">
-            <Icon icon="ant-design:zoom-in-outlined" />
-          </a-button>
-          <a-button shape="circle" @click="cF.setZoom(false)">
-            <Icon icon="ant-design:zoom-out-outlined" />
-          </a-button>
-  
-          <a-button shape="circle" @click="cF.delete()">
-            <Icon icon="ant-design:delete-outlined" />
-          </a-button>
-        </div>
+          <v-btn icon="$plus" @click="cF.setZoom(true)">
+          </v-btn>
+          <v-btn icon="$minus" @click="cF.setZoom(false)">
+          </v-btn>
+          <v-btn icon="$delete" @click="cF.delete()">
+          </v-btn>
       </div>
       <!-- 画布区域 -->
       <div class="markbox-center">
-        <a-tabs v-model:activeKey="activeKey" @change="tabChange">
-          <a-tab-pane key="1" tab="全部" />
-          <a-tab-pane key="2" tab="有标注" force-render />
-          <a-tab-pane key="3" tab="无标注" />
-        </a-tabs>
-        <a-button type="primary" @click="getCfData">保存当前标注（s）</a-button>
-  
         <!-- 画布 -->
         <canvas id="canvas"></canvas>
-  
-        <!-- 切换区域 -->
-        <div class="markbox-img">
-          <img :src="item.url" v-for="(item, i) in imgList" :key="i" @click="beforeChange(item)" />
-        </div>
-      </div>
-      <!-- 标签区域 -->
-      <div class="markbox-right">
-        <a-input v-model:value="searchValue" @change="onSearch" placeholder="请输入标签" style="width: 200px">
-          <template #suffix>
-            <Icon icon="ant-design:search-outlined" :style="{ color: 'rgba(0,0,0,.25)' }" />
-          </template>
-        </a-input>
-        <a-divider class="markbox-right-border" />
-        <div class="markbox-right-tag">
-          <a-button :type="actionTag == item ? 'primary' : 'dashed'" v-for="item in targetList" @click="tagChange(item)" :key="item">
-            <Icon icon="ant-design:tag-outlined" />
-            {{ item }}</a-button
-          >
-        </div>
       </div>
     </div>
   </template>
   <script lang="ts">
     import { defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue';
     //import { useMessage } from '/@/hooks/web/useMessage'; 
-    import myFabric from '@/utils/draw.js';
-    const { createMessage } = useMessage();
+    import myFabric from '@/utils/draw';
+    // const { createMessage } = useMessage();
     export default defineComponent({
       setup() {
         const state = reactive({
@@ -120,7 +87,7 @@
         const beforeChange = (item) => {
           // 如果有标签为空不能切换
           if (state.cF.getAll().some((item) => !item.label)) {
-            createMessage.warn('所有标注必须设有标签');
+            console.log('所有标注必须设有标签');
             return;
           }
           initMyFabric(item);

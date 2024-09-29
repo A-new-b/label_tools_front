@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { fabric } from 'fabric';
+import {fabric} from 'fabric'
+// import * as fabric from 'fabric';
 
 // 删除img
 const deleteIcon =
@@ -99,9 +100,8 @@ class myFabric {
 
         // 绘制矩形的模式下，才执行下面的代码
         // 松开鼠标左键时，将当前坐标 赋值给 upPoint
-        this.upPoint = e.absolutePointer;
         // 调用 创建矩形 的方法
-        this.createRect();
+        this.createPolygon();
         change(this.getAll());
       }); // 鼠标在画布上松开
 
@@ -117,13 +117,11 @@ class myFabric {
    * 创建矩形和text组
    * @param {object}   item   {x,y,w,h,r,label}
    */
+    
   creatGroup(item) {
-    const { top, left, width, height, angle } = item;
-    const rect = new fabric.Rect({
-      top,
-      left,
-      width,
-      height,
+    const {points, angle } = item;
+    const polygon = new fabric.Polygon({
+      points,
       angle,
       padding: 0,
       strokeUniform: true,
@@ -143,11 +141,59 @@ class myFabric {
       fontSize: 14,
       textAlign: 'center',
     });
-    const group = new fabric.Group([rect, text]);
+    const group = new fabric.Group([polygon, text]);
     return group;
   }
-  // 创建矩形
-  createRect() {
+  
+  //创建点
+
+  creatGroup(subpoint) {
+    const {x, y } = subpoint;
+    const polygon = new fabric.Polygon({
+      points,
+      angle,
+      padding: 0,
+      strokeUniform: true,
+      noScaleCache: false,
+      stroke: this.label ? 'lightgreen' : 'red',
+      strokeWidth: 1,
+      fill: 'rgba(0,0,255,0.2)', // 填充色：透明
+    });
+    // 矩形对象
+    const text = new fabric.Textbox(this.label, {
+      top: top + height / 2.3,
+      left,
+      width,
+      height,
+      fontFamily: 'Helvetica',
+      fill: 'white', // 设置字体颜色
+      fontSize: 14,
+      textAlign: 'center',
+    });
+    const group = new fabric.Group([polygon, text]);
+    return group;
+  }
+
+  createPoint() {
+    if (!this.isOff) return;
+    // 如果点击和松开鼠标，都是在同一个坐标点，不会生成矩形
+    if (JSON.stringify(this.downPoint) === JSON.stringify(this.upPoint)) {
+      return;
+    }685189
+    
+    // 创建矩形
+    // 矩形参数计算
+    const x = Math.min(this.downPoint.y, this.upPoint.y);
+    const y = Math.min(this.downPoint.x, this.upPoint.x);
+
+    this.canvas.add(
+      this.creatGroup({
+        x,y
+      })
+    );
+  }
+   // 创建多边形
+   createPolygon() {
     if (!this.isOff) return;
     // 如果点击和松开鼠标，都是在同一个坐标点，不会生成矩形
     if (JSON.stringify(this.downPoint) === JSON.stringify(this.upPoint)) {

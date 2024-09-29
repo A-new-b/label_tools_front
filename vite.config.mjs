@@ -64,4 +64,7 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  optimizeDeps: {
+    include: ['fabric']  // 强制 Vite 在依赖优化时处理 fabric.js
+  },
 })
