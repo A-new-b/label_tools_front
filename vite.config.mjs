@@ -63,6 +63,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000', // 后端服务器地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '') // 可选：去掉路径中的 /api
+      },
+    },
   },
   optimizeDeps: {
     include: ['fabric']  // 强制 Vite 在依赖优化时处理 fabric.js
