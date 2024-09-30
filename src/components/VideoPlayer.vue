@@ -6,7 +6,7 @@
       <VSpacer></VSpacer>
       <canvas width="640" height="480" ref="canvas1"></canvas>
       <canvas width="640" height="480" ref="canvas2"></canvas>
-      <v-btn color="primary" @click="startCapture2">Diff</v-btn>
+      <v-btn color="primary" @click="Diff">Diff</v-btn>
 
       <Edit_canvas ref="canvas3"></Edit_canvas>
       <VSpacer></VSpacer>
@@ -20,12 +20,16 @@
   import { ref } from 'vue';
   // import myfabric from './myfabric.vue';
   import Edit_canvas from './edit_canvas.vue';
-  import { fabric } from 'fabric';
+  import axios from 'axios';
   // 创建响应式引用
   const video = ref(null);
   const canvas1 = ref(null);
   const canvas2 = ref(null);
   const canvas3 = ref(null);
+  let bg=null;
+  let gas = null;
+  let threshold = 0;
+
 
   // 加载视频元数据
   const onLoadedMetadata = () => {
@@ -45,6 +49,7 @@
     ctx.drawImage(videoElement, 0, 0, canvas1Element.width, canvas1Element.height);
     // 获取帧数据
     const frameData = canvas1Element.toDataURL('image/png');
+    bg = frameData;
     console.log('Current Frame:', frameData);
   };
 
@@ -60,10 +65,31 @@
     ctx.drawImage(videoElement, 0, 0, canvas2Element.width, canvas2Element.height);
     // 获取帧数据
     const frameData = canvas2Element.toDataURL('image/png');
+    gas = frameData;
     console.log('Current Frame:', frameData);
   };
 
-  // const startCapture2 = () => {
+  const Diff = () => {
+    threshold = 10;
+    axios.post('/api/image_diff', {
+      image1: bg,
+      image2: gas,
+      threshold: threshold
+    })
+    .then(function (response) {
+      const editCanvasElement = canvas3.value;
+      let image = response.data.diff_image;
+      editCanvasElement.drawImage(image);
+      console.log(image);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  };
+
+  // const Diff = () => {
+  //   threshold = 10;
+
   //   const videoElement = video.value;
   //   const canvas2Element = canvas3.value;
 

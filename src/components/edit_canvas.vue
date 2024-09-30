@@ -149,38 +149,61 @@
     points = []
   }
 
-  function drawImage(videoElement) {
-    // 创建临时 Canvas 以获取视频帧
-    const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = canvas.value.width
-    tempCanvas.height = canvas.value.height
-    const context = tempCanvas.getContext('2d')
-
-    // 清空画布并绘制视频帧
-    context.clearRect(0, 0, tempCanvas.width, tempCanvas.height)
-    context.drawImage(videoElement, 0, 0, tempCanvas.width, tempCanvas.height)
-
+  function drawImage(image) {
     // 将临时 Canvas 作为背景图像
-    const imgData = tempCanvas.toDataURL('image/png')
-    fabric.Image.fromURL(imgData, (img) => {
+    // const imgData = image
+    console.log(image)
+    fabric.Image.fromURL(image, (img) => {
       img.set({
         left: 0,
         top: 0,
         selectable: false // 禁止选中背景图像
       })
-      
-      // 移除旧背景
-      if (backgroundImage) {
-        canvas.value.remove(backgroundImage)
-      }
-      
-      // 添加新的背景图像
-      backgroundImage = img
-      canvas.value.add(backgroundImage)
-      canvas.value.sendToBack(backgroundImage) // 将背景图像置于底层
-      canvas.value.renderAll()
+       // 移除旧背景
+       if (backgroundImage) {
+          canvas.value.remove(backgroundImage)
+        }
+        
+        // 添加新的背景图像
+        backgroundImage = img
+        canvas.value.add(backgroundImage)
+        canvas.value.sendToBack(backgroundImage) // 将背景图像置于底层
+        canvas.value.renderAll()
     })
   }
+
+  // function drawImage(videoElement) {
+  //   // 创建临时 Canvas 以获取视频帧
+  //   const tempCanvas = document.createElement('canvas')
+  //   tempCanvas.width = canvas.value.width
+  //   tempCanvas.height = canvas.value.height
+  //   const context = tempCanvas.getContext('2d')
+
+  //   // 清空画布并绘制视频帧
+  //   context.clearRect(0, 0, tempCanvas.width, tempCanvas.height)
+  //   context.drawImage(videoElement, 0, 0, tempCanvas.width, tempCanvas.height)
+
+  //   // 将临时 Canvas 作为背景图像
+  //   const imgData = tempCanvas.toDataURL('image/png')
+    // fabric.Image.fromURL(imgData, (img) => {
+    //   img.set({
+    //     left: 0,
+    //     top: 0,
+    //     selectable: false // 禁止选中背景图像
+    //   })
+      
+    //   // 移除旧背景
+    //   if (backgroundImage) {
+    //     canvas.value.remove(backgroundImage)
+    //   }
+      
+    //   // 添加新的背景图像
+    //   backgroundImage = img
+    //   canvas.value.add(backgroundImage)
+    //   canvas.value.sendToBack(backgroundImage) // 将背景图像置于底层
+    //   canvas.value.renderAll()
+    // })
+  // }
   
   onMounted(() => {
     init()
