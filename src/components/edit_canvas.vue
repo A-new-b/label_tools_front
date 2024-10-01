@@ -45,9 +45,11 @@
       // 监听控制点的移动
       if ('cid' in target && target.cid.match(/circle-/)) {
         let index = target.cid.split('-')[1]
-        let points = currentPolygon.points
-        points[index].x = target.left - currentPolygon.left
-        points[index].y = target.top - currentPolygon.top
+        // 从控制点获取关联的多边形
+        let polygon = target.polygon
+        let points = polygon.points
+        points[index].x = target.left - polygon.left
+        points[index].y = target.top - polygon.top
         canvas.value.renderAll()
       }
     })
@@ -125,11 +127,14 @@
       // 从画布中移除选中的多边形
       canvas.value.remove(activeObject)
   
-      // 查找并删除对应的控制点
+      // 移除对应的控制点
+      if (activeObject.circles) {
+        activeObject.circles.forEach(circle => canvas.value.remove(circle))
+      }
+
+      // 从 polygons 数组中移除
       const index = polygons.findIndex(p => p.polygon === activeObject)
       if (index !== -1) {
-        const circles = polygons[index].circles
-        circles.forEach(circle => canvas.value.remove(circle))
         polygons.splice(index, 1)
       }
     }
