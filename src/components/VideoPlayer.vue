@@ -4,6 +4,13 @@
         <source src="F:\LabelTools\label_tools_front\videos\test.mp4" type="video/mp4" />
       </video>
       <VSpacer></VSpacer>
+      <v-file-input
+        label="Select Video"
+        accept="video/mp4"
+        v-model="selectedFile"
+        @change="onFileChange"
+      ></v-file-input>
+      <VSpacer></VSpacer>
       <canvas width="640" height="480" ref="canvas1"></canvas>
       <canvas width="640" height="480" ref="canvas2"></canvas>
       <v-btn color="primary" @click="Diff">Diff</v-btn>
@@ -35,7 +42,14 @@
   const onLoadedMetadata = () => {
     console.log('Video metadata loaded.');
   };
-
+  // 更新视频
+  const onFileChange = () => {
+    const file = selectedFile.value;
+    if (file) {
+        videoSrc.value = URL.createObjectURL(file);
+        video.value.load();
+    }
+  };
   // 开始捕获帧
   const startCapture1 = () => {
     const videoElement = video.value;
