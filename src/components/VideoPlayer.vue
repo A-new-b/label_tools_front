@@ -1,7 +1,7 @@
 <template>
     <div>
       <video ref="video" @loadedmetadata="onLoadedMetadata" controls>
-        <source src="F:\LabelTools\label_tools_front\videos\test.mp4" type="video/mp4" />
+        <source :src="videoSrc" type="video/mp4" />
       </video>
       <VSpacer></VSpacer>
       <v-file-input
@@ -33,6 +33,9 @@
   const canvas1 = ref(null);
   const canvas2 = ref(null);
   const canvas3 = ref(null);
+  const selectedFile = ref(null); 
+  const videoSrc = ref(null);
+  
   let bg=null;
   let gas = null;
   let threshold = 0;
@@ -45,12 +48,12 @@
   };
   // 更新视频
   const onFileChange = () => {
-    const file = selectedFile.value;
-    if (file) {
-        videoSrc.value = URL.createObjectURL(file);
-        video.value.load();
-    }
-  };
+  const file = selectedFile.value;
+  if (file) {
+    videoSrc.value = URL.createObjectURL(file);
+    video.value.load();
+  }
+};
   // 开始捕获帧
   const startCapture1 = () => {
     const videoElement = video.value;
