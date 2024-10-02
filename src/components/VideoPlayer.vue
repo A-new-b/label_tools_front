@@ -36,6 +36,7 @@
   let bg=null;
   let gas = null;
   let threshold = 0;
+  let selectedFile = null;
 
 
   // 加载视频元数据
