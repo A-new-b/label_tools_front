@@ -102,7 +102,7 @@ const videoSrc = ref(null);
 
 let bg = null;
 let gas = null;
-const threshold = ref(10);
+const threshold = ref(5);
 const opacity = ref(0.5);
 
 // 加载视频元数据
