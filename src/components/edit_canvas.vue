@@ -1,8 +1,9 @@
 <template>
     <div>
+
+      <canvas width="640" height="480" id="canvas" style="border: 1px solid #ccc;"></canvas>
       <v-btn @click="toggleDrawing" color="primary">{{ isDrawing ? 'Finish Drawing' : 'New Polygon' }}</v-btn>
       <v-btn @click="deleteSelected" color="error">Delete Selected Polygon</v-btn>
-      <canvas width="640" height="480" id="canvas" style="border: 1px solid #ccc;"></canvas>
     </div>
   </template>
   
