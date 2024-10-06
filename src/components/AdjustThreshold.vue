@@ -12,7 +12,7 @@
   const props = defineProps({
     modelValue: {
       type: Number,
-      default: 10,
+      default: 5,
     },
   });
   
