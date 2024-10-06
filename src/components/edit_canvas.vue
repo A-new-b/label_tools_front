@@ -192,47 +192,96 @@
     })
   }
 
+  // function exportPoint() {
+  //   const canvasWidth = canvas.value.width;
+  //   const canvasHeight = canvas.value.height;
+
+  //   let polygonsData = polygons.map((poly, index) => {
+  //     return {
+  //       polygonIndex: index,
+  //       points: poly.polygon.points.map(point => {
+  //         return {
+  //           x: (point.x / canvasWidth).toFixed(16),
+  //           y: (point.y / canvasHeight).toFixed(16)
+  //         };
+  //       })
+  //     };
+  //   });
+
+  //   // 转化为 JSON 格式
+  //   const polygonsJson = JSON.stringify(polygonsData, null, 2);
+
+  //   // 通过 axios 发送 POST 请求到 Flask 后端
+  //   axios.post('/api/polygons', polygonsData)
+  //     .then(response => {
+  //       console.log('Response from server:', response.data);
+
+  //       // 获取下载链接
+  //       const downloadLinks = response.data.download_links;
+  //       downloadLinks.forEach(link => {
+  //         console.log('Download link:', link);
+  //         // 你可以通过设置链接的方式让用户下载
+  //         const a = document.createElement('a');
+  //         a.href = "http://localhost:5000"+link;
+  //         a.download = link.split('/').pop();  // 获取文件名
+  //         a.textContent = `Download ${a.download}`;
+  //         document.body.appendChild(a);
+  //       });
+  //     })
+  //     .catch(error => {
+  //       console.error('Error sending data to server:', error);
+  //     });
+  // }
+
   function exportPoint() {
-    const canvasWidth = canvas.value.width;
-    const canvasHeight = canvas.value.height;
+  const canvasWidth = canvas.value.width;
+  const canvasHeight = canvas.value.height;
 
-    let polygonsData = polygons.map((poly, index) => {
-      return {
-        polygonIndex: index,
-        points: poly.polygon.points.map(point => {
-          return {
-            x: (point.x / canvasWidth).toFixed(16),
-            y: (point.y / canvasHeight).toFixed(16)
-          };
-        })
-      };
-    });
-
-    // 转化为 JSON 格式
-    const polygonsJson = JSON.stringify(polygonsData, null, 2);
-
-    // 通过 axios 发送 POST 请求到 Flask 后端
-    axios.post('/api/polygons', polygonsData)
-      .then(response => {
-        console.log('Response from server:', response.data);
-
-        // 获取下载链接
-        const downloadLinks = response.data.download_links;
-        downloadLinks.forEach(link => {
-          console.log('Download link:', link);
-          // 你可以通过设置链接的方式让用户下载
-          const a = document.createElement('a');
-          a.href = "http://localhost:5000"+link;
-          a.download = link.split('/').pop();  // 获取文件名
-          a.textContent = `Download ${a.download}`;
-          document.body.appendChild(a);
-        });
+  let polygonsData = polygons.map((poly, index) => {
+    return {
+      polygonIndex: index,
+      points: poly.polygon.points.map(point => {
+        return {
+          x: (point.x / canvasWidth).toFixed(16),
+          y: (point.y / canvasHeight).toFixed(16)
+        };
       })
-      .catch(error => {
-        console.error('Error sending data to server:', error);
-      });
-  }
+    };
+  });
 
+  // 转化为 JSON 格式
+  const polygonsJson = JSON.stringify(polygonsData, null, 2);
+
+  // 通过 axios 发送 POST 请求到 Flask 后端
+  axios.post('/api/polygons', polygonsData)
+    .then(response => {
+      console.log('Response from server:', response.data);
+
+      // 获取下载链接
+      const downloadLinks = response.data.download_links;
+      if (downloadLinks.length > 0) {
+        // 如果已有下载链接，先移除旧的
+        let existingLink = document.getElementById('download-link');
+        if (existingLink) {
+          existingLink.parentNode.removeChild(existingLink);
+        }
+
+        // 创建新的下载链接
+        const link = downloadLinks[0]; 
+        const a = document.createElement('a');
+        a.href = "http://localhost:5000" + link;
+        a.download = link.split('/').pop();  // 获取文件名
+        a.textContent = `下载 ${a.download}`;
+        a.id = 'download-link'; // 设置ID以便以后更新
+        document.body.appendChild(a);
+
+
+      }
+    })
+    .catch(error => {
+      console.error('Error sending data to server:', error);
+    });
+}
 
   onMounted(() => {
     init()

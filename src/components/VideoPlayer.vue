@@ -1,34 +1,3 @@
-<!-- <template>
-  <div>
-    <v-file-input
-      label="Select Video"
-      accept="video/mp4"
-      v-model="selectedFile"
-      @change="onFileChange"
-    ></v-file-input>
-    <video ref="video" @loadedmetadata="onLoadedMetadata" controls>
-      <source :src="videoSrc" type="video/mp4" />
-    </video>
-    
-    <VSpacer></VSpacer>
-
-    <Edit_canvas ref="canvas3"></Edit_canvas>
-
-    <v-btn color="primary" @click="startCapture1">Capturing1</v-btn>
-    <v-btn color="primary" @click="startCapture2">Capturing2</v-btn>
-    <v-btn color="primary" @click="Diff">Diff</v-btn>
-
-    <VSpacer></VSpacer>
-    <canvas width="640" height="480" ref="canvas1"></canvas>
-    <canvas width="640" height="480" ref="canvas2"></canvas>
-
-    <VSpacer></VSpacer>
-    <AdjustThreshold v-model="threshold"></AdjustThreshold>
-    <AdjustOpacity v-model="opacity"></AdjustOpacity>
-  
-  </div>
-</template> -->
-
 <template>
   <div>
     <v-file-input
