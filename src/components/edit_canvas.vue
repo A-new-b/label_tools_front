@@ -109,50 +109,38 @@
       isDrawing.value = true
     }
   }
-  
-  // 完成绘制多边形
+
   function finishDrawing() {
-    if (currentPolygon) {
-      polygons.push({
-        polygon: currentPolygon,
-        circles: currentCircleList
-      })
-      currentPolygon.selectable = true // 结束绘制后，允许选择多边形
-      currentPolygon.hasControls = true // 允许缩放
-    }
-    isDrawing.value = false
+  if (currentPolygon) {
+    currentPolygon.id = Date.now(); // 使用时间戳作为唯一 ID
+    polygons.push({
+      polygon: currentPolygon,
+      circles: currentCircleList
+    });
+    currentPolygon.selectable = true; // 结束绘制后，允许选择多边形
+    currentPolygon.hasControls = true; // 允许缩放
   }
+  isDrawing.value = false;
+}
   
-  // 删除选中的多边形
   function deleteSelected() {
-    const activeObject = canvas.value.getActiveObject();
-    if (activeObject && activeObject.type === 'polygon') {
-      // 从画布中移除选中的多边形
-      canvas.value.remove(activeObject);
+  const activeObject = canvas.value.getActiveObject();
+  if (activeObject && activeObject.type === 'polygon') {
+    // 从画布中移除选中的多边形
+    canvas.value.remove(activeObject);
 
-      // 移除对应的控制点
-      if (activeObject.circles) {
-        activeObject.circles.forEach(circle => canvas.value.remove(circle));
-      }
+    // 移除对应的控制点
+    if (activeObject.circles) {
+      activeObject.circles.forEach(circle => canvas.value.remove(circle));
+    }
 
-      // 从 polygons 数组中移除
-      const index = polygons.findIndex(p => p.polygon === activeObject);
-      if (index !== -1) {
-        // 删除与选中多边形关联的点
-        const polygonPoints = polygons[index].polygon.points;
-        polygonPoints.forEach(point => {
-          // 查找并删除 points 数组中对应的点
-          const pointIndex = points.findIndex(p => p.x === point.x && p.y === point.y);
-          if (pointIndex !== -1) {
-            points.splice(pointIndex, 1);
-          }
-        });
-
-        // 从 polygons 数组中移除该多边形
-        polygons.splice(index, 1);
-      }
+    // 从 polygons 数组中移除该多边形
+    const index = polygons.findIndex(p => p.polygon.id === activeObject.id);
+    if (index !== -1) {
+      polygons.splice(index, 1);
     }
   }
+}
 
   
   // 重置当前多边形
