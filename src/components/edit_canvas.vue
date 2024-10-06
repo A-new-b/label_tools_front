@@ -1,9 +1,9 @@
 <template>
     <div>
+      <canvas width="640" height="480" id="canvas" style="border: 1px solid #ccc;"></canvas>
       <v-btn @click="toggleDrawing" color="primary">{{ isDrawing ? 'Finish Drawing' : 'New Polygon' }}</v-btn>
       <v-btn @click="deleteSelected" color="error">Delete</v-btn>
       <v-btn @click="exportPoint" color="primary">Export</v-btn>
-      <canvas width="640" height="480" id="canvas" style="border: 1px solid #ccc;"></canvas>
     </div>
   </template>
   
@@ -109,50 +109,38 @@
       isDrawing.value = true
     }
   }
-  
-  // 完成绘制多边形
+
   function finishDrawing() {
-    if (currentPolygon) {
-      polygons.push({
-        polygon: currentPolygon,
-        circles: currentCircleList
-      })
-      currentPolygon.selectable = true // 结束绘制后，允许选择多边形
-      currentPolygon.hasControls = true // 允许缩放
-    }
-    isDrawing.value = false
+  if (currentPolygon) {
+    currentPolygon.id = Date.now(); // 使用时间戳作为唯一 ID
+    polygons.push({
+      polygon: currentPolygon,
+      circles: currentCircleList
+    });
+    currentPolygon.selectable = true; // 结束绘制后，允许选择多边形
+    currentPolygon.hasControls = true; // 允许缩放
   }
+  isDrawing.value = false;
+}
   
-  // 删除选中的多边形
   function deleteSelected() {
-    const activeObject = canvas.value.getActiveObject();
-    if (activeObject && activeObject.type === 'polygon') {
-      // 从画布中移除选中的多边形
-      canvas.value.remove(activeObject);
+  const activeObject = canvas.value.getActiveObject();
+  if (activeObject && activeObject.type === 'polygon') {
+    // 从画布中移除选中的多边形
+    canvas.value.remove(activeObject);
 
-      // 移除对应的控制点
-      if (activeObject.circles) {
-        activeObject.circles.forEach(circle => canvas.value.remove(circle));
-      }
+    // 移除对应的控制点
+    if (activeObject.circles) {
+      activeObject.circles.forEach(circle => canvas.value.remove(circle));
+    }
 
-      // 从 polygons 数组中移除
-      const index = polygons.findIndex(p => p.polygon === activeObject);
-      if (index !== -1) {
-        // 删除与选中多边形关联的点
-        const polygonPoints = polygons[index].polygon.points;
-        polygonPoints.forEach(point => {
-          // 查找并删除 points 数组中对应的点
-          const pointIndex = points.findIndex(p => p.x === point.x && p.y === point.y);
-          if (pointIndex !== -1) {
-            points.splice(pointIndex, 1);
-          }
-        });
-
-        // 从 polygons 数组中移除该多边形
-        polygons.splice(index, 1);
-      }
+    // 从 polygons 数组中移除该多边形
+    const index = polygons.findIndex(p => p.polygon.id === activeObject.id);
+    if (index !== -1) {
+      polygons.splice(index, 1);
     }
   }
+}
 
   
   // 重置当前多边形
@@ -193,46 +181,54 @@
   }
 
   function exportPoint() {
-    const canvasWidth = canvas.value.width;
-    const canvasHeight = canvas.value.height;
+  const canvasWidth = canvas.value.width;
+  const canvasHeight = canvas.value.height;
 
-    let polygonsData = polygons.map((poly, index) => {
-      return {
-        polygonIndex: index,
-        points: poly.polygon.points.map(point => {
-          return {
-            x: (point.x / canvasWidth).toFixed(16),
-            y: (point.y / canvasHeight).toFixed(16)
-          };
-        })
-      };
-    });
-
-    // 转化为 JSON 格式
-    const polygonsJson = JSON.stringify(polygonsData, null, 2);
-
-    // 通过 axios 发送 POST 请求到 Flask 后端
-    axios.post('/api/polygons', polygonsData)
-      .then(response => {
-        console.log('Response from server:', response.data);
-
-        // 获取下载链接
-        const downloadLinks = response.data.download_links;
-        downloadLinks.forEach(link => {
-          console.log('Download link:', link);
-          // 你可以通过设置链接的方式让用户下载
-          const a = document.createElement('a');
-          a.href = "http://localhost:5000"+link;
-          a.download = link.split('/').pop();  // 获取文件名
-          a.textContent = `Download ${a.download}`;
-          document.body.appendChild(a);
-        });
+  let polygonsData = polygons.map((poly, index) => {
+    return {
+      polygonIndex: index,
+      points: poly.polygon.points.map(point => {
+        return {
+          x: (point.x / canvasWidth).toFixed(16),
+          y: (point.y / canvasHeight).toFixed(16)
+        };
       })
-      .catch(error => {
-        console.error('Error sending data to server:', error);
-      });
-  }
+    };
+  });
 
+  // 转化为 JSON 格式
+  const polygonsJson = JSON.stringify(polygonsData, null, 2);
+
+  // 通过 axios 发送 POST 请求到 Flask 后端
+  axios.post('/api/polygons', polygonsData)
+    .then(response => {
+      console.log('Response from server:', response.data);
+
+      // 获取下载链接
+      const downloadLinks = response.data.download_links;
+      if (downloadLinks.length > 0) {
+        // 如果已有下载链接，先移除旧的
+        let existingLink = document.getElementById('download-link');
+        if (existingLink) {
+          existingLink.parentNode.removeChild(existingLink);
+        }
+
+        // 创建新的下载链接
+        const link = downloadLinks[0]; 
+        const a = document.createElement('a');
+        a.href = "http://localhost:5000" + link;
+        a.download = link.split('/').pop();  // 获取文件名
+        a.textContent = `Download ${a.download}`;
+        a.id = 'download-link'; // 设置ID以便以后更新
+        document.body.appendChild(a);
+
+
+      }
+    })
+    .catch(error => {
+      console.error('Error sending data to server:', error);
+    });
+}
 
   onMounted(() => {
     init()
